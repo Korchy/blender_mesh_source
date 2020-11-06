@@ -5,6 +5,7 @@
 #    https://github.com/Korchy/blender_mesh_source
 
 from .object_source_alias import Alias
+from .object_source_bl_types_conversion import BlTypesConversion
 
 
 class MeshSource:
@@ -26,4 +27,18 @@ class MeshSource:
         source += 'new_object = bpy.data.objects.new(name=\'' + object_alias + '\', object_data=new_mesh)' + '\n'
         # add object to collection
         source += collection + '.objects.link(new_object)' + '\n'
-        return source
+        # location
+        source += '# position' + '\n'
+        source += 'new_object.location = ' + BlTypesConversion.source_by_type(
+            item=obj,
+            value=obj.location
+        ) + '\n'
+        source += 'new_object.rotation_euler = ' + BlTypesConversion.source_by_type(
+            item=obj,
+            value=obj.rotation_euler
+        ) + '\n'
+        source += 'new_object.scale = ' + BlTypesConversion.source_by_type(
+            item=obj,
+            value=obj.scale
+        ) + '\n'
+        return source + '\n'
