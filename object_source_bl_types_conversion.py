@@ -7,6 +7,7 @@
 # Blender types conversion
 # Blender types with prefix BL
 
+import re
 import sys
 from mathutils import Vector, Color
 
@@ -23,7 +24,7 @@ class BlTypesConversion:
         elif isinstance(value, (int, float, bool, set)):
             return ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + str(value)
         elif isinstance(value, str):
-            return ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + '\'' + value + '\''
+            return ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + '\'' + value + ('\\' if value[-1] == '\\' else '') + '\''
         elif hasattr(sys.modules[__name__], 'BL' + value.__class__.__name__):
             value_class = getattr(sys.modules[__name__], 'BL' + value.__class__.__name__)
             return value_class.to_source(value=value, parent_expr=parent_expr, deep=deep)
@@ -144,6 +145,17 @@ class BLImage:
         source += ('    ' * (deep + 1)) + 'if os.path.exists(os.path.join(external_items_dir, \'' + value.name + '\')):' + '\n'
         source += ('    ' * (deep + 2)) + 'bpy.data.images.load(os.path.join(external_items_dir, \'' + value.name + '\'))' + '\n'
         source += ((parent_expr + ' = ') if parent_expr else '') + 'bpy.data.images.get(\'' + value.name + '\')'
+        return source
+
+
+class BLCacheFile:
+
+    @classmethod
+    def to_source(cls, value, parent_expr='', deep=0):
+        source = ('    ' * deep) + 'if \'' + value.name + '\' not in bpy.data.cache_files:' + '\n'
+        source += ('    ' * (deep + 1)) + 'if os.path.exists(os.path.join(external_items_dir, \'' + value.name + '\')):' + '\n'
+        source += ('    ' * (deep + 2)) + 'bpy.ops.cachefile.open(os.path.join(external_items_dir, \'' + value.name + '\'))' + '\n'
+        source += ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + 'bpy.data.cache_files.get(\'' + value.name + '\')'
         return source
 
 

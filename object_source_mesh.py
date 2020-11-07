@@ -8,6 +8,7 @@ from .object_source_alias import Alias
 from .object_source_bl_types_conversion import BlTypesConversion
 from .object_source_modifier import ModifierSource
 
+
 class MeshSource:
 
     @classmethod
@@ -17,9 +18,9 @@ class MeshSource:
         object_alias = Alias.alias(item=obj)
         mesh_alias = Alias.alias(item=obj.data)
         # mesh
-        source += 'vertices = ' + str([(vert.co.x, vert.co.y, vert.co.z) for vert in obj.data.vertices]) + '' + '\n'
-        source += 'edges = ' + str([[vert for vert in edge.vertices] for edge in obj.data.edges]) + '' + '\n'
-        source += 'faces = ' + str([[vert for vert in polygon.vertices] for polygon in obj.data.polygons]) + '' + '\n'
+        source += 'vertices = ' + str([(vert.co.x, vert.co.y, vert.co.z) for vert in obj.data.vertices]) + '\n'
+        source += 'edges = ' + str([[vert for vert in edge.vertices] for edge in obj.data.edges]) + '\n'
+        source += 'faces = ' + str([[vert for vert in polygon.vertices] for polygon in obj.data.polygons]) + '\n'
         source += 'new_mesh = bpy.data.meshes.new(\'' + mesh_alias + '\')' + '\n'
         source += 'new_mesh.from_pydata(vertices, edges, faces)' + '\n'
         source += 'new_mesh.update()' + '\n'
@@ -41,6 +42,11 @@ class MeshSource:
             item=obj,
             value=obj.scale
         ) + '\n'
+        # shade flat/smooth
+        source += '# flat/smooth' + '\n'
+        source += 'smooth_data = ' + str([polygon.use_smooth for polygon in obj.data.polygons]) + '\n'
+        source += 'for i, polygon in enumerate(new_object.data.polygons):' + '\n'
+        source += '    ' + 'polygon.use_smooth = (True if smooth_data[i] else False)'+ '\n'
         # UVs
         if obj.data.uv_layers:
             source += '# UVs' + '\n'
@@ -56,5 +62,8 @@ class MeshSource:
                 source += ModifierSource.to_source(
                     modifier=modifier,
                     parent_expr='new_object'
-                ) + '\n'
+                )
+        # update
+        source += '# UPDATE' + '\n'
+        source += 'new_object.data.update()' + '\n'
         return source + '\n'
