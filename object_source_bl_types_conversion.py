@@ -21,9 +21,9 @@ class BlTypesConversion:
         elif isinstance(value, Color):
             return BLColor.to_source(value=value, parent_expr=parent_expr, deep=deep)
         elif isinstance(value, (int, float, bool, set)):
-            return ((parent_expr + ' = ') if parent_expr else '') + str(value)
+            return ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + str(value)
         elif isinstance(value, str):
-            return ((parent_expr + ' = ') if parent_expr else '') + '\'' + value + '\''
+            return ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + '\'' + value + '\''
         elif hasattr(sys.modules[__name__], 'BL' + value.__class__.__name__):
             value_class = getattr(sys.modules[__name__], 'BL' + value.__class__.__name__)
             return value_class.to_source(value=value, parent_expr=parent_expr, deep=deep)
@@ -67,14 +67,15 @@ class BlTypesConversion:
         # first - preordered attributes, next - all other attributes
         all_attributes = preordered_attributes + attributes
         for attribute in all_attributes:
+            source_cond = 'if hasattr(' + parent_expr + ', \'' + attribute + '\'):' + '\n'
             source_expr = BlTypesConversion.source_by_type(
                 item=attribute,
                 value=getattr(value, attribute),
                 parent_expr=parent_expr + '.' + attribute,
-                deep=deep
+                deep=deep+1
             )
             if source_expr is not None:
-                source += source_expr + ('' if source_expr[-1:] == '\n' else '\n')
+                source += source_cond + source_expr + ('' if source_expr[-1:] == '\n' else '\n')
         return source
 
 
@@ -83,7 +84,7 @@ class TupleType:
 
     @classmethod
     def to_source(cls, value, parent_expr='', deep=0):
-        return ((parent_expr + ' = ') if parent_expr else '') + str(tuple(value))
+        return ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + str(tuple(value))
 
 
 class BLColor(TupleType):
@@ -125,14 +126,14 @@ class BLScene:
 
     @classmethod
     def to_source(cls, value, parent_expr='', deep=0):
-        return ((parent_expr + ' = ') if parent_expr else '') + 'bpy.data.scenes.get(\'' + value.name + '\')'
+        return ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + 'bpy.data.scenes.get(\'' + value.name + '\')'
 
 
 class BLObject:
 
     @classmethod
     def to_source(cls, value, parent_expr='', deep=0):
-        return ((parent_expr + ' = ') if parent_expr else '') + 'bpy.data.objects.get(\'' + value.name + '\')'
+        return ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + 'bpy.data.objects.get(\'' + value.name + '\')'
 
 
 class BLImage:
@@ -150,21 +151,21 @@ class BLText:
 
     @classmethod
     def to_source(cls, value, parent_expr='', deep=0):
-        return ((parent_expr + ' = ') if parent_expr else '') + 'bpy.data.texts.get(\'' + value.name + '\')'
+        return ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + 'bpy.data.texts.get(\'' + value.name + '\')'
 
 
 class BLParticleSystem:
 
     @classmethod
     def to_source(cls, value, parent_expr='', deep=0):
-        return ((parent_expr + ' = ') if parent_expr else '') + 'bpy.context.active_object.particle_systems.get(\'' + value.name + '\')'
+        return ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + 'bpy.context.active_object.particle_systems.get(\'' + value.name + '\')'
 
 
 class BLShaderNodeTree:
 
     @classmethod
     def to_source(cls, value, parent_expr='', deep=0):
-        return ((parent_expr + ' = ') if parent_expr else '') + 'bpy.data.node_groups.get(\'' + value.name + '\')'
+        return ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + 'bpy.data.node_groups.get(\'' + value.name + '\')'
 
 
 class BLCompositorNodeTree(BLShaderNodeTree):
@@ -175,7 +176,7 @@ class BLNodeFrame:
 
     @classmethod
     def to_source(cls, value, parent_expr='', deep=0):
-        return ((parent_expr + ' = ') if parent_expr else '') + 'node_tree' + str(deep) + '.nodes.get(\'' + value.name + '\')'
+        return ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + 'node_tree' + str(deep) + '.nodes.get(\'' + value.name + '\')'
 
 
 class BLCurveMapping:

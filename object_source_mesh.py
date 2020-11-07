@@ -5,8 +5,8 @@
 #    https://github.com/Korchy/blender_mesh_source
 
 from .object_source_alias import Alias
-from .object_source_bl_types_conversion import BlTypesConversion, BLVector
-
+from .object_source_bl_types_conversion import BlTypesConversion
+from .object_source_modifier import ModifierSource
 
 class MeshSource:
 
@@ -42,9 +42,19 @@ class MeshSource:
             value=obj.scale
         ) + '\n'
         # UVs
-        for uv in obj.data.uv_layers:
-            source += 'uv_xy = ' + str([(data.uv.x, data.uv.y) for data in uv.data]) + '\n'
-            source += 'new_uv = new_object.data.uv_layers.new(name=\'' + uv.name + '\')' + '\n'
-            source += 'for loop in new_object.data.loops:' + '\n'
-            source += '    ' + 'new_uv.data[loop.index].uv = uv_xy[loop.index]' + '\n'
+        if obj.data.uv_layers:
+            source += '# UVs' + '\n'
+            for uv in obj.data.uv_layers:
+                source += 'uv_xy = ' + str([(data.uv.x, data.uv.y) for data in uv.data]) + '\n'
+                source += 'new_uv = new_object.data.uv_layers.new(name=\'' + uv.name + '\')' + '\n'
+                source += 'for loop in new_object.data.loops:' + '\n'
+                source += '    ' + 'new_uv.data[loop.index].uv = uv_xy[loop.index]' + '\n'
+        # Modifiers
+        if obj.modifiers:
+            source += '# modifiers' + '\n'
+            for modifier in obj.modifiers:
+                source += ModifierSource.to_source(
+                    modifier=modifier,
+                    parent_expr='new_object'
+                ) + '\n'
         return source + '\n'
