@@ -5,7 +5,7 @@
 #    https://github.com/Korchy/blender_mesh_source
 
 from .object_source_alias import Alias
-from .object_source_bl_types_conversion import BlTypesConversion
+from .object_source_bl_types_conversion import BlTypesConversion, BLVector
 
 
 class MeshSource:
@@ -41,4 +41,10 @@ class MeshSource:
             item=obj,
             value=obj.scale
         ) + '\n'
+        # UVs
+        for uv in obj.data.uv_layers:
+            source += 'uv_xy = ' + str([(data.uv.x, data.uv.y) for data in uv.data]) + '\n'
+            source += 'new_uv = new_object.data.uv_layers.new(name=\'' + uv.name + '\')' + '\n'
+            source += 'for loop in new_object.data.loops:' + '\n'
+            source += '    ' + 'new_uv.data[loop.index].uv = uv_xy[loop.index]' + '\n'
         return source + '\n'

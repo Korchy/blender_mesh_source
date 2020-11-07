@@ -104,6 +104,9 @@ class ObjectSource:
         collection_alias = 'source_collection'
         source += cls._collection(name=source_alias, alias=collection_alias)
         # objects
+        current_mode = context.object.mode
+        if current_mode == 'EDIT':
+            bpy.ops.object.mode_set(mode='OBJECT')
         for obj in objects:
             # object data
             if obj.type == 'MESH':
@@ -113,6 +116,7 @@ class ObjectSource:
                     context=context,
                     scene_data=scene_data
                 )
+        bpy.ops.object.mode_set(mode=current_mode)
         return source, source_alias
 
     @staticmethod
