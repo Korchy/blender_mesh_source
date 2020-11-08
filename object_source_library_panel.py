@@ -27,7 +27,7 @@ class OBJECT_SOURCE_LIB_PT_panel_3d_view(Panel):
             active_propname='object_source_lib_active_item'
         )
         col = row.column(align=True)
-        col.operator('object_source_lib.remove_object', icon='REMOVE', text='')
+        col.operator('object_source_lib.remove_item', icon='REMOVE', text='')
 
 
 class OBJECT_SOURCE_LIB_UL_lib_items(UIList):

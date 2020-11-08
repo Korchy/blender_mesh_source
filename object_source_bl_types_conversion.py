@@ -24,7 +24,8 @@ class BlTypesConversion:
         elif isinstance(value, (int, float, bool, set)):
             return ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + str(value)
         elif isinstance(value, str):
-            return ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + '\'' + value + ('\\' if value[-1] == '\\' else '') + '\''
+            value_escaped = value.translate(str.maketrans({'\'': r'\'', '\\': r'\\'}))  # escape some characters (', \)
+            return ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + '\'' + value_escaped + '\''
         elif hasattr(sys.modules[__name__], 'BL' + value.__class__.__name__):
             value_class = getattr(sys.modules[__name__], 'BL' + value.__class__.__name__)
             return value_class.to_source(value=value, parent_expr=parent_expr, deep=deep)
@@ -68,12 +69,12 @@ class BlTypesConversion:
         # first - preordered attributes, next - all other attributes
         all_attributes = preordered_attributes + attributes
         for attribute in all_attributes:
-            source_cond = 'if hasattr(' + parent_expr + ', \'' + attribute + '\'):' + '\n'
+            source_cond = ('    ' * deep) + 'if hasattr(' + parent_expr + ', \'' + attribute + '\'):' + '\n'
             source_expr = BlTypesConversion.source_by_type(
                 item=attribute,
                 value=getattr(value, attribute),
                 parent_expr=parent_expr + '.' + attribute,
-                deep=deep+1
+                deep=deep + 1
             )
             if source_expr is not None:
                 source += source_cond + source_expr + ('' if source_expr[-1:] == '\n' else '\n')
@@ -144,8 +145,66 @@ class BLImage:
         source = ('    ' * deep) + 'if \'' + value.name + '\' not in bpy.data.images:' + '\n'
         source += ('    ' * (deep + 1)) + 'if os.path.exists(os.path.join(external_items_dir, \'' + value.name + '\')):' + '\n'
         source += ('    ' * (deep + 2)) + 'bpy.data.images.load(os.path.join(external_items_dir, \'' + value.name + '\'))' + '\n'
-        source += ((parent_expr + ' = ') if parent_expr else '') + 'bpy.data.images.get(\'' + value.name + '\')'
+        source += ('    ' * deep) + ((parent_expr + ' = ') if parent_expr else '') + 'bpy.data.images.get(\'' + value.name + '\')'
         return source
+
+
+class BLImageTexture:
+
+    @classmethod
+    def to_source(cls, value, parent_expr='', deep=0):
+        source = ('    ' * deep) + 'image_texture = bpy.data.textures.get(\'' + value.name + '\')' + '\n'
+        source += ('    ' * deep) + 'if not image_texture:' + '\n'
+        source += ('    ' * (deep + 1)) + 'image_texture = bpy.data.textures.new(name=\'' + value.name + '\', type=\'' + value.type + '\')' + '\n'
+        source += BlTypesConversion.source_from_complex_type(
+            value=value,
+            preordered_attributes=['use_color_ramp'],
+            complex_attributes=['color_ramp'],
+            parent_expr='image_texture',
+            deep=deep + 1
+        )
+        source += ('    ' * deep) + parent_expr + ' = image_texture' + '\n'
+        return source
+
+
+class BLBlendTexture(BLImageTexture):
+    pass
+
+
+class BLCloudsTexture(BLImageTexture):
+    pass
+
+
+class BLDistortedNoiseTexture(BLImageTexture):
+    pass
+
+
+class BLMagicTexture(BLImageTexture):
+    pass
+
+
+class BLMarbleTexture(BLImageTexture):
+    pass
+
+
+class BLMusgraveTexture(BLImageTexture):
+    pass
+
+
+class BLNoiseTexture(BLImageTexture):
+    pass
+
+
+class BLStucciTexture(BLImageTexture):
+    pass
+
+
+class BLVoronoiTexture(BLImageTexture):
+    pass
+
+
+class BLWoodTexture(BLImageTexture):
+    pass
 
 
 class BLCacheFile:
@@ -226,6 +285,35 @@ class BLCurveMapPoint:
         source = ('    ' * deep) + 'if ' + parent_expr.strip()[-2:][:1] + ' >= len(' + parent_expr.strip()[:-3] + '):' + '\n'
         source += ('    ' * (deep + 1)) + parent_expr.strip()[:-3] + '.new(' + str(value.location.x) + ', ' + str(value.location.y) + ')' + '\n'
         source += BlTypesConversion.source_from_complex_type(
+            value=value,
+            parent_expr=parent_expr,
+            deep=deep
+        )
+        return source
+
+
+class BLCurveProfile(BLCurveMap):
+    # curve
+
+    @classmethod
+    def to_source(cls, value, parent_expr='', deep=0):
+        source = ('    ' * deep) + 'for i in range(' + str(len(value.points) - 2) + '):' + '\n'
+        source += ('    ' * (deep + 1)) + parent_expr + '.points.add(x=0.0, y=0.0)' + '\n'
+        source += BlTypesConversion.source_from_complex_type(
+            value=value,
+            complex_attributes=['points'],
+            parent_expr=parent_expr,
+            deep=deep
+        )
+        return source
+
+
+class BLCurveProfilePoint:
+    # point
+
+    @classmethod
+    def to_source(cls, value, parent_expr='', deep=0):
+        source = BlTypesConversion.source_from_complex_type(
             value=value,
             parent_expr=parent_expr,
             deep=deep
