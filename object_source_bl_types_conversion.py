@@ -97,6 +97,17 @@ class BLVector(TupleType):
     pass
 
 
+class BLMatrix():
+
+    @classmethod
+    def to_source(cls, value, parent_expr='', deep=0):
+        source = ''
+        for i in range(len(value)):
+            source += (', ' if source else '') + str(tuple(value.row[i]))
+        source = '(' + source + ')'
+        return ('    ' * deep) + parent_expr + ' = ' + source
+
+
 class BLbpy_prop_array(TupleType):
     pass
 
