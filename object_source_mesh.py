@@ -47,6 +47,13 @@ class MeshSource:
         source += 'smooth_data = ' + str([polygon.use_smooth for polygon in obj.data.polygons]) + '\n'
         source += 'for i, polygon in enumerate(new_object.data.polygons):' + '\n'
         source += '    ' + 'polygon.use_smooth = (True if smooth_data[i] else False)'+ '\n'
+        # vertex groups
+        if obj.vertex_groups:
+            source += '# vertex groups' + '\n'
+            for vertex_group in obj.vertex_groups:
+                source += 'vertex_group_data = ' + str([vert.index for vert in obj.data.vertices if obj.vertex_groups[vertex_group.name].index in [i.group for i in vert.groups]]) + '\n'
+                source += 'vertex_group = new_object.vertex_groups.new(name=\'' + vertex_group.name + '\')' + '\n'
+                source += 'vertex_group.add(vertex_group_data, 1.0, \'ADD\')' + '\n'
         # UVs
         if obj.data.uv_layers:
             source += '# UVs' + '\n'
