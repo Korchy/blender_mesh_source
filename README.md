@@ -13,7 +13,7 @@ The "Mesh Source" add-on also has its own library into which you can save the me
 
 <img src="https://b3d.interplanety.org/wp-content/upload_content/2020/11/preview_02_1200x600-560x280.jpg"><p>
 
-If you want to distribute your materials to other users, the “Mesh Source” material library can be compiled into a separate add-on. Specify the path and click the “Distribute Library as Add-on” button. The complete archive with an add-on that includes the entire library of materials will be created. Users just need to download the add-on you provided and install it, after which they can immediately use the materials you provide.
+If you want to distribute your meshes to other users, the "Mesh Source" library can be compiled into a separate add-on. Specify the path and press the "Distribute Library as Add-on" button. The complete archive with an add-on that includes the entire library of meshes will be created. Now you can distribute the add-on among Blender users in any convenient way. Users just need to download the add-on you provided and install it, after which they can immediately use the models you provide.
 
 Important
 -
