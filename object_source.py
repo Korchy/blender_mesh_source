@@ -104,7 +104,7 @@ class ObjectSource:
         collection_alias = 'source_collection'
         source += cls._collection(name=source_alias, alias=collection_alias)
         # objects
-        current_mode = context.object.mode
+        current_mode = context.object.mode if context.object else 'OBJECT'
         if current_mode == 'EDIT':
             bpy.ops.object.mode_set(mode='OBJECT')
         for obj in objects:
@@ -116,7 +116,8 @@ class ObjectSource:
                     context=context,
                     scene_data=scene_data
                 )
-        bpy.ops.object.mode_set(mode=current_mode)
+        if context.object:
+            bpy.ops.object.mode_set(mode=current_mode)
         return source, source_alias
 
     @staticmethod
