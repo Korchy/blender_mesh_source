@@ -19,6 +19,6 @@ class Alias:
         else:
             alias = item.name
         if alias:
-            for ch in (' ', '.', '/'):
+            for ch in (' ', '.', '/', '-'):
                 alias = alias.replace(ch, '_')
         return alias
