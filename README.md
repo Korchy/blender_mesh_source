@@ -30,11 +30,11 @@ Note that materials assigned to a mesh are not processed. The "NodeTree Source" 
 
 Current add-on version
 -
-1.0.0.
+1.0.1.
 
 Blender versions
 -
-2.83, 2.90, 2.91
+2.83, 2.90, 2.91, 2.92, 2.93, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5
 
 Location and call
 -
@@ -46,6 +46,9 @@ Installation
 - The “Preferences” window — Add-ons — Install… — specify the downloaded archive.
 
 Version history
+
+1.0.1.
+- Fixed issue with the text_block.from_string - string/text parameter name
 
 1.0.0.
 - This release.

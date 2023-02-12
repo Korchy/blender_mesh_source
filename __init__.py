@@ -18,7 +18,7 @@ bl_info = {
     'name': 'Mesh_Source',
     'category': 'All',
     'author': 'Nikita Akimov',
-    'version': (1, 0, 0),
+    'version': (1, 0, 1),
     'blender': (2, 90, 0),
     'location': 'N-Panel > Mesh Source',
     'wiki_url': 'https://b3d.interplanety.org/en/blender-add-on-mesh-source/',
