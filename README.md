@@ -17,7 +17,7 @@ If you want to distribute your meshes to other users, the "Mesh Source" library 
 
 Important
 -
-The local mesh source library is stored in the add-on directory. If you need to temporarily remove or reinstall the add-on, be sure to back up the library in a separate place on the disk first. After reinstalling the add-on, the library can be restored simply by copying it to the "mesh_source_library" directory of the add-on.
+The local mesh source library is stored in the add-on directory. If you need to temporarily remove or reinstall the add-on, be sure to backup the library in a separate place on the disk first. After reinstalling the add-on, the library can be restored simply by copying it to the "mesh_source_library" directory of the add-on.
 
 The following data is supported in meshes source code:
 
